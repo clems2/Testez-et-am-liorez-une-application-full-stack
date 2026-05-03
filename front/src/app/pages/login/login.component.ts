@@ -7,6 +7,7 @@ import { LoginRequest } from '../../core/models/loginRequest.interface';
 import { AuthService } from '../../core/service/auth.service';
 import {MaterialModule} from "../../shared/material.module";
 import { CommonModule } from '@angular/common';
+import { catchError, EMPTY, tap } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -42,12 +43,16 @@ export class LoginComponent {
 
   public submit(): void {
     const loginRequest = this.form.value as LoginRequest;
-    this.authService.login(loginRequest).subscribe({
-      next: (response: SessionInformation) => {
+
+    this.authService.login(loginRequest).pipe(
+      tap((response: SessionInformation) => {
         this.sessionService.logIn(response);
         this.router.navigate(['/sessions']);
-      },
-      error: error => this.onError = true,
-    });
+      }),
+      catchError(() => {
+        this.onError = true;
+        return EMPTY;
+      })
+    ).subscribe();
   }
 }

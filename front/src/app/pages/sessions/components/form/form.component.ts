@@ -8,6 +8,13 @@ import { Session } from '../../../../core/models/session.interface';
 import { SessionApiService } from '../../../../core/service/session-api.service';
 import { MaterialModule } from "../../../../shared/material.module";
 import { CommonModule } from "@angular/common";
+import { map, switchMap, of, Observable } from 'rxjs';
+
+
+type FormDatas = {
+  form: FormGroup;
+  onUpdate: boolean;
+};
 
 @Component({
   selector: 'app-form',
@@ -15,7 +22,7 @@ import { CommonModule } from "@angular/common";
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss']
 })
-export class FormComponent implements OnInit {
+export class FormComponent {
   private route = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private matSnackBar = inject(MatSnackBar);
@@ -29,62 +36,55 @@ export class FormComponent implements OnInit {
   public teachers$ = this.teacherService.all();
   private id: string | undefined;
 
-  ngOnInit(): void {
-    if (!this.sessionService.sessionInformation!.admin) {
-      this.router.navigate(['/sessions']);
-    }
-    const url = this.router.url;
-    if (url.includes('update')) {
-      this.onUpdate = true;
-      this.id = this.route.snapshot.paramMap.get('id')!;
-      this.sessionApiService
-        .detail(this.id)
-        .subscribe((session: Session) => this.initForm(session));
-    } else {
-      this.initForm();
-    }
-  }
+  public datas$: Observable<FormDatas> = this.route.paramMap.pipe(
+    switchMap(params => {
+      const id = params.get('id');
 
-  public submit(): void {
-    const session = this.sessionForm?.value as Session;
+      if (id) {
+        return this.sessionApiService.detail(id).pipe(
+          map(session => ({
+            form: this.initForm(session),
+            onUpdate: true
+          }))
+        );
+      }
 
-    if (!this.onUpdate) {
-      this.sessionApiService
-        .create(session)
-        .subscribe((_: Session) => this.exitPage('Session created !'));
-    } else {
-      this.sessionApiService
-        .update(this.id!, session)
-        .subscribe((_: Session) => this.exitPage('Session updated !'));
-    }
-  }
+      return of({
+        form: this.initForm(),
+        onUpdate: false
+      });
+    })
+  );
 
-  private initForm(session?: Session): void {
-    this.sessionForm = this.fb.group({
-      name: [
-        session ? session.name : '',
-        [Validators.required]
-      ],
+  private initForm(session?: Session): FormGroup {
+    return this.fb.group({
+      name: [session?.name || '', [Validators.required]],
       date: [
         session ? new Date(session.date).toISOString().split('T')[0] : '',
         [Validators.required]
       ],
-      teacher_id: [
-        session ? session.teacher_id : '',
-        [Validators.required]
-      ],
+      teacher_id: [session?.teacher_id || '', [Validators.required]],
       description: [
-        session ? session.description : '',
-        [
-          Validators.required,
-          Validators.max(2000)
-        ]
-      ],
+        session?.description || '',
+        [Validators.required, Validators.maxLength(2000)]
+      ]
     });
   }
 
-  private exitPage(message: string): void {
-    this.matSnackBar.open(message, 'Close', { duration: 3000 });
-    this.router.navigate(['sessions']);
+  public submit(datas:FormDatas): void {
+    const session = datas.form.value as Session;
+
+    const request$ = datas.onUpdate
+      ? this.sessionApiService.update(this.route.snapshot.paramMap.get('id')!, session)
+      : this.sessionApiService.create(session);
+
+    request$.subscribe(() => {
+      this.matSnackBar.open(
+        datas.onUpdate ? 'Session updated !' : 'Session created !',
+        'Close',
+        { duration: 3000 }
+      );
+      this.router.navigate(['sessions']);
+    });
   }
 }
