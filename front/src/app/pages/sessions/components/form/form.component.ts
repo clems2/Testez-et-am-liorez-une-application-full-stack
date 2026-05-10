@@ -87,4 +87,8 @@ export class FormComponent {
       this.router.navigate(['sessions']);
     });
   }
+
+  public back(): void {
+    window.history.back();
+  }
 }
