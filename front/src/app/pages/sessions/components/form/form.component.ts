@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { SessionApiService } from '../../../../core/service/session-api.service'
 import { MaterialModule } from "../../../../shared/material.module";
 import { CommonModule } from "@angular/common";
 import { map, switchMap, of, Observable } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 
 type FormDatas = {
@@ -27,14 +28,12 @@ export class FormComponent {
   private fb = inject(FormBuilder);
   private matSnackBar = inject(MatSnackBar);
   private sessionApiService = inject(SessionApiService);
-  private sessionService = inject(SessionService);
   private teacherService = inject(TeacherService);
   private router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  public onUpdate: boolean = false;
-  public sessionForm: FormGroup | undefined;
+
   public teachers$ = this.teacherService.all();
-  private id: string | undefined;
 
   public datas$: Observable<FormDatas> = this.route.paramMap.pipe(
     switchMap(params => {
@@ -78,14 +77,16 @@ export class FormComponent {
       ? this.sessionApiService.update(this.route.snapshot.paramMap.get('id')!, session)
       : this.sessionApiService.create(session);
 
-    request$.subscribe(() => {
-      this.matSnackBar.open(
-        datas.onUpdate ? 'Session updated !' : 'Session created !',
-        'Close',
-        { duration: 3000 }
-      );
-      this.router.navigate(['sessions']);
-    });
+    request$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.matSnackBar.open(
+          datas.onUpdate ? 'Session updated !' : 'Session created !',
+          'Close',
+          { duration: 3000 }
+        );
+        this.router.navigate(['sessions']);
+      });
   }
 
   public back(): void {

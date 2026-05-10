@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SessionInformation } from 'src/app/core/models/sessionInformation.interface';
@@ -8,6 +8,7 @@ import { AuthService } from '../../core/service/auth.service';
 import {MaterialModule} from "../../shared/material.module";
 import { CommonModule } from '@angular/common';
 import { catchError, EMPTY, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,8 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private sessionService = inject(SessionService);
+  private readonly destroyRef = inject(DestroyRef);
+
 
   public hide = true;
   public onError = false;
@@ -52,7 +55,8 @@ export class LoginComponent {
       catchError(() => {
         this.onError = true;
         return EMPTY;
-      })
+      }),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe();
   }
 }

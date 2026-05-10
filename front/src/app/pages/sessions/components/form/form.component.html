@@ -1,46 +1,56 @@
-<div class="create m3" *ngIf="datas$ | async as datas">
-  <mat-card>
+@if (datas$ | async; as datas) {
+  <div class="create m3">
+    <mat-card>
 
-    <mat-card-title>
-      <div fxLayout="row" fxLayoutAlign="start center">
-        <button mat-icon-button (click)="back()">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
+      <mat-card-title>
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <button mat-icon-button (click)="back()">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
 
-        <h1 *ngIf="!datas.onUpdate">Create session</h1>
-        <h1 *ngIf="datas.onUpdate">Update session</h1>
-      </div>
-    </mat-card-title>
+          @if (!datas.onUpdate) {
+            <h1>Create session</h1>
+          }
+          @if (datas.onUpdate) {
+            <h1>Update session</h1>
+          }
+        </div>
+      </mat-card-title>
 
-    <mat-card-content>
-      <form [formGroup]="datas.form" (ngSubmit)="submit(datas)">
+      <mat-card-content>
+        <form [formGroup]="datas.form" (ngSubmit)="submit(datas)">
 
-        <mat-form-field>
-          <input matInput formControlName="name">
-        </mat-form-field>
+          <mat-form-field>
+            <input matInput formControlName="name">
+          </mat-form-field>
 
-        <mat-form-field>
-          <input matInput type="date" formControlName="date">
-        </mat-form-field>
+          <mat-form-field>
+            <input matInput type="date" formControlName="date">
+          </mat-form-field>
 
-        <mat-form-field>
-          <mat-select formControlName="teacher_id">
-            <mat-option *ngFor="let teacher of teachers$ | async" [value]="teacher.id">
-              {{teacher.firstName}} {{teacher.lastName}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+          <mat-form-field>
+            <mat-select formControlName="teacher_id">
+              @if (teachers$ | async; as teachers) {
+                @for (teacher of teachers; track teacher.id) {
+                  <mat-option [value]="teacher.id">
+                    {{ teacher.firstName }} {{ teacher.lastName }}
+                  </mat-option>
+                }
+              }
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field>
-          <textarea matInput formControlName="description"></textarea>
-        </mat-form-field>
+          <mat-form-field>
+            <textarea matInput formControlName="description"></textarea>
+          </mat-form-field>
 
-        <button type="submit" [disabled]="datas.form.invalid">
-          Save
-        </button>
+          <button type="submit" [disabled]="datas.form.invalid">
+            Save
+          </button>
 
-      </form>
-    </mat-card-content>
+        </form>
+      </mat-card-content>
 
-  </mat-card>
-</div>
+    </mat-card>
+  </div>
+}

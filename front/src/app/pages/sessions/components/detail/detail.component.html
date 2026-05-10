@@ -1,50 +1,53 @@
-<div class="m3" *ngIf="datas$ | async as datas">
+@if (datas$ | async; as datas) {
+  <div class="m3">
 
-  <mat-card>
-    <mat-card-title>
-      <div fxLayout="row" fxLayoutAlign="space-between center">
+    <mat-card>
+      <mat-card-title>
+        <div fxLayout="row" fxLayoutAlign="space-between center">
 
-        <div fxLayout="row" fxLayoutAlign="start center">
-          <button mat-icon-button (click)="back()">
-            <mat-icon>arrow_back</mat-icon>
-          </button>
-          <h1>{{ datas.session.name | titlecase }}</h1>
-        </div>
-
-        <div>
-          <button *ngIf="datas.isAdmin"
-                  mat-raised-button color="warn"
-                  (click)="delete()">
-            Delete
-          </button>
-
-          <ng-container *ngIf="!datas.isAdmin">
-            <button *ngIf="!datas.isParticipate"
-                    mat-raised-button color="primary"
-                    (click)="participate()">
-              Participate
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <button mat-icon-button (click)="back()">
+              <mat-icon>arrow_back</mat-icon>
             </button>
+            <h1>{{ datas.session.name | titlecase }}</h1>
+          </div>
 
-            <button *ngIf="datas.isParticipate"
-                    mat-raised-button color="warn"
-                    (click)="unParticipate()">
-              Do not participate
-            </button>
-          </ng-container>
+          <div>
+            @if (datas.isAdmin) {
+              <button mat-raised-button color="warn"
+                      (click)="delete()">
+                Delete
+              </button>
+            } @else {
+              @if (!datas.isParticipate) {
+                <button mat-raised-button color="primary"
+                        (click)="participate()">
+                  Participate
+                </button>
+              }
+
+              @if (datas.isParticipate) {
+                <button mat-raised-button color="warn"
+                        (click)="unParticipate()">
+                  Do not participate
+                </button>
+              }
+            }
+          </div>
+
         </div>
+      </mat-card-title>
 
-      </div>
-    </mat-card-title>
+      <mat-card-subtitle>
+        {{ datas.teacher.firstName }} {{ datas.teacher.lastName }}
+      </mat-card-subtitle>
 
-    <mat-card-subtitle>
-      {{ datas.teacher.firstName }} {{ datas.teacher.lastName }}
-    </mat-card-subtitle>
+      <mat-card-content>
+        <p>{{ datas.session.description }}</p>
+        <p>{{ datas.session.users.length }} attendees</p>
+      </mat-card-content>
 
-    <mat-card-content>
-      <p>{{ datas.session.description }}</p>
-      <p>{{ datas.session.users.length }} attendees</p>
-    </mat-card-content>
+    </mat-card>
 
-  </mat-card>
-
-</div>
+  </div>
+}
