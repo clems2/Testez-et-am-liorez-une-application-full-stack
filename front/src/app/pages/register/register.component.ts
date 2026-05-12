@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/service/auth.service';
@@ -10,9 +10,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
   imports: [CommonModule, MaterialModule],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RegisterComponent {
   private authService = inject(AuthService);
@@ -20,7 +22,7 @@ export class RegisterComponent {
   private router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  public onError = false;
+  public onError = signal(false);
 
   public form = this.fb.group({
     email: [
@@ -63,7 +65,7 @@ export class RegisterComponent {
     this.authService.register(registerRequest).pipe(
       tap(() => this.router.navigate(['/login'])),
       catchError(() => {
-        this.onError = true;
+        this.onError.set(true);
         return EMPTY;
       }),
       takeUntilDestroyed(this.destroyRef)

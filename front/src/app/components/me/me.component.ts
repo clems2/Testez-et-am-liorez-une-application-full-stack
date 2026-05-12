@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -11,9 +11,11 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-me',
+  standalone: true,
   imports: [CommonModule, MaterialModule],
   templateUrl: './me.component.html',
-  styleUrls: ['./me.component.scss']
+  styleUrls: ['./me.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MeComponent {
   private readonly router = inject(Router);
@@ -39,5 +41,4 @@ export class MeComponent {
         this.router.navigate(['/']);
       });
   }
-
 }

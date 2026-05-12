@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SessionInformation } from 'src/app/core/models/sessionInformation.interface';
@@ -12,9 +12,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, MaterialModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
   private authService = inject(AuthService);
@@ -25,7 +27,7 @@ export class LoginComponent {
 
 
   public hide = true;
-  public onError = false;
+  public readonly onError = signal(false);
 
   public form = this.fb.group({
     email: [
@@ -53,7 +55,7 @@ export class LoginComponent {
         this.router.navigate(['/sessions']);
       }),
       catchError(() => {
-        this.onError = true;
+        this.onError.set(true);
         return EMPTY;
       }),
       takeUntilDestroyed(this.destroyRef)

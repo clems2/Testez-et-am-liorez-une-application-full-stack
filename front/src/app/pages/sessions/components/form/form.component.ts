@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,9 +19,11 @@ type FormDatas = {
 
 @Component({
   selector: 'app-form',
+  standalone: true,
   imports: [CommonModule, MaterialModule],
   templateUrl: './form.component.html',
-  styleUrls: ['./form.component.scss']
+  styleUrls: ['./form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormComponent {
   private route = inject(ActivatedRoute);
@@ -31,7 +33,6 @@ export class FormComponent {
   private teacherService = inject(TeacherService);
   private router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-
 
   public teachers$ = this.teacherService.all();
 
