@@ -10,9 +10,11 @@ import com.openclassrooms.starterjwt.payload.response.MessageResponse;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 import com.openclassrooms.starterjwt.security.jwt.JwtUtils;
 import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
+import com.openclassrooms.starterjwt.services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,19 +27,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private final AuthService authService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                   PasswordEncoder passwordEncoder,
-                   JwtUtils jwtUtils,
-                   UserRepository userRepository) {
+    //TODO remove the rest of service responsibility
+    public AuthController(AuthService authService,
+                          AuthenticationManager authenticationManager,
+                          PasswordEncoder passwordEncoder,
+                          JwtUtils jwtUtils,
+                          UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -66,19 +72,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new BadRequestException("Error: Email is already taken!");
-        }
-
-        // Create new user's account
-        User user = new User(signUpRequest.getEmail(),
-                signUpRequest.getLastName(),
-                signUpRequest.getFirstName(),
-                passwordEncoder.encode(signUpRequest.getPassword()),
-                false);
-
-        userRepository.save(user);
-
+        this.authService.register(signUpRequest);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
