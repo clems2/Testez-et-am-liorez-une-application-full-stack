@@ -9,7 +9,7 @@ import { Session } from '../../../../core/models/session.interface';
 import { SessionApiService } from '../../../../core/service/session-api.service';
 import { MaterialModule } from "../../../../shared/material.module";
 import { CommonModule } from "@angular/common";
-import { map, switchMap, Observable } from 'rxjs';
+import { map, switchMap, Observable, Subject, startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 
@@ -39,12 +39,19 @@ export class DetailComponent {
 
 
   public sessionId = this.route.snapshot.paramMap.get('id')!;
-  public userId = this.sessionService.sessionInformation!.id; //toString()
+  public userId = this.sessionService.sessionInformation!.id;
   public strUserId = this.sessionService.sessionInformation!.id.toString();
 
-  public datas$: Observable<DetailDatas> = this.loadDatas();   
+  private readonly refresh$ = new Subject<void>();
 
- private loadDatas(): Observable<DetailDatas> {
+  public readonly datas$: Observable<DetailDatas> = this.refresh$.pipe(
+    startWith(undefined as void),
+    switchMap(() => this.loadDatas())
+  );
+
+
+
+  private loadDatas(): Observable<DetailDatas> {
     return this.sessionApiService.detail(this.sessionId).pipe(
       switchMap(session =>
         this.teacherService.detail(session.teacher_id.toString()).pipe(
@@ -77,17 +84,12 @@ export class DetailComponent {
   public participate(): void {
     this.sessionApiService.participate(this.sessionId, this.strUserId)
     .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe(() => this.fetchSession());
+    .subscribe(() => this.refresh$.next());
   }
 
   public unParticipate(): void {
     this.sessionApiService.unParticipate(this.sessionId, this.strUserId)
     .pipe(takeUntilDestroyed(this.destroyRef))
-    .subscribe(() => this.fetchSession());
+    .subscribe(() => this.refresh$.next());
   }
-
-  private fetchSession(): void {
-    this.datas$ = this.loadDatas();
-  }
-
 }
