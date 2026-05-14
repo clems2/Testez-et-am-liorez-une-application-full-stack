@@ -1,6 +1,7 @@
 package com.openclassrooms.starterjwt.controllers;
 
 
+import com.openclassrooms.starterjwt.exception.BadRequestException;
 import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.payload.request.LoginRequest;
 import com.openclassrooms.starterjwt.payload.request.SignupRequest;
@@ -66,9 +67,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already taken!"));
+            throw new BadRequestException("Error: Email is already taken!");
         }
 
         // Create new user's account
