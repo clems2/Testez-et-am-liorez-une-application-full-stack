@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
-
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -36,14 +34,8 @@ public class UserController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> save(@PathVariable("id") String id) {
-        User user = this.userService.findById(Long.valueOf(id));
-
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Objects.equals(userDetails.getUsername(), user.getEmail())) {
-            throw new UnauthorizedException("You are not authorized to delete this user");
-        }
-
-        this.userService.delete(Long.parseLong(id));
+        this.userService.delete(Long.parseLong(id), userDetails.getUsername());
         return ResponseEntity.ok().build();
     }
 }
