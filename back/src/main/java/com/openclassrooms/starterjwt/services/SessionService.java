@@ -27,7 +27,8 @@ public class SessionService {
     }
 
     public void delete(Long id) {
-        this.sessionRepository.deleteById(id);
+        Session session = this.findSessionOrThrow(id);
+        this.sessionRepository.delete(session);
     }
 
     public List<Session> findAll() {
@@ -35,8 +36,7 @@ public class SessionService {
     }
 
     public Session getById(Long id) {
-        return this.sessionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Session not found with id " + id));
+        return this.findSessionOrThrow(id);
     }
 
     public Session update(Long id, Session session) {
@@ -45,8 +45,7 @@ public class SessionService {
     }
 
     public void participate(Long id, Long userId) {
-        Session session = this.sessionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Session not found with id " + id));
+        Session session = this.findSessionOrThrow(id);
         User user = this.userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id " + userId));
 
@@ -60,9 +59,7 @@ public class SessionService {
     }
 
     public void noLongerParticipate(Long id, Long userId) {
-        Session session = this.sessionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Session not found with id " + id));
-
+        Session session = this.findSessionOrThrow(id);
         boolean alreadyParticipate = session.getUsers().stream().anyMatch(o -> o.getId().equals(userId));
         if (!alreadyParticipate) {
             throw new BadRequestException("User does not participate in this session");
@@ -71,5 +68,10 @@ public class SessionService {
         session.setUsers(session.getUsers().stream().filter(user -> !user.getId().equals(userId)).collect(Collectors.toList()));
 
         this.sessionRepository.save(session);
+    }
+
+    private Session findSessionOrThrow(Long id) {
+        return this.sessionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Session not found with id " + id));
     }
 }
