@@ -35,11 +35,28 @@ public class AuthService {
         this.jwtUtils = jwtUtils;
     }
 
+    public JwtResponse login(LoginRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-    /**
-     * Registers a new (non-admin) user after verifying the email is not already taken.
-     */
+        boolean isAdmin = userRepository.findByEmail(userDetails.getUsername())
+                .map(User::isAdmin)
+                .orElse(false);
+
+        return new JwtResponse(
+                jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getFirstName(),
+                userDetails.getLastName(),
+                isAdmin
+        );
+    }
+
     public void register(SignupRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new BadRequestException("Error: Email is already taken!");
