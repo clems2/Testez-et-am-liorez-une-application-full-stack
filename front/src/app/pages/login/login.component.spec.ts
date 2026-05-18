@@ -19,6 +19,7 @@ const mockSessionInformation: SessionInformation = {
   admin: false
 };
 
+// Successfull login test, error handling tests in case of wrong credentials, error message display test on required fields missing
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
