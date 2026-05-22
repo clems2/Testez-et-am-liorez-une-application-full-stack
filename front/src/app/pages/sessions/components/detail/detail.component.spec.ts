@@ -59,6 +59,7 @@ class MatSnackBarMock {
   open = jest.fn();
 }
 
+//Session informations tests, Delete session tests, Participate/Unparticipate tests (visible buttons and HTTP requests)
 describe('DetailComponent', () => {
   let component: DetailComponent;
   let fixture: ComponentFixture<DetailComponent>;
