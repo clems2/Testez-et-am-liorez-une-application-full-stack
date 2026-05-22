@@ -37,12 +37,24 @@ Report is available here:
 
 > front/coverage/lcov-report/index.html
 
-#### Unitary test
+#### Unit and integration tests (Jest)
 
-Launching test:
+Launch all tests with coverage report:
 
 > npm run test
 
-for following change:
+For continuous testing on file change:
 
 > npm run test:watch
+
+The coverage report is generated at `coverage/jest/index.html` and can be opened in a browser.
+
+**Coverage thresholds**: 80% minimum on statements, branches, lines, and functions.
+
+To run a specific test file:
+
+> npx jest src/app/path/to/file.spec.ts
+
+To check coverage for a specific file only:
+
+> npx jest src/app/path/to/file.spec.ts --coverage --collectCoverageFrom="src/app/path/to/file.ts"

@@ -22,10 +22,10 @@ module.exports = {
   coveragePathIgnorePatterns: ['<rootDir>/node_modules/'],
   coverageThreshold: {
     global: {
-      statements: 0,
-      branches: 0,
-      lines: 0,
-      functions: 0,
+      statements: 80,
+      branches: 80,
+      lines: 80,
+      functions: 80,
     },
   },
   roots: [
