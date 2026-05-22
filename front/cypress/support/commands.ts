@@ -41,3 +41,37 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+/// <reference types="cypress" />
+
+// Custom command : connexion en tant qu'admin ou user via les fixtures.
+// Ce raccourci évite de répéter le flow complet de login dans chaque test.
+Cypress.Commands.add('loginAs', (role: 'admin' | 'user') => {
+  const fixture = role === 'admin' ? 'user-admin' : 'user-non-admin';
+
+  cy.fixture(fixture).then((userFixture) => {
+    cy.intercept('POST', '/api/auth/login', {
+      statusCode: 200,
+      body: userFixture
+    }).as('login');
+
+    cy.intercept('GET', '/api/session', { fixture: 'sessions.json' }).as('sessions');
+
+    cy.visit('/login');
+    cy.get('input[formControlName=email]').type(userFixture.username);
+    cy.get('input[formControlName=password]').type('test!1234{enter}');
+    cy.wait('@login');
+    cy.url().should('include', '/sessions');
+  });
+});
+
+// Déclaration TypeScript pour que le custom command soit reconnu.
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      loginAs(role: 'admin' | 'user'): Chainable<void>;
+    }
+  }
+}
+
+export {};

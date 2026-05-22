@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Morning Yoga",
+    "description": "Start your day with energy",
+    "date": "2026-06-01T00:00:00.000+00:00",
+    "teacher_id": 1,
+    "users": [],
+    "createdAt": "2026-05-01T00:00:00.000+00:00",
+    "updatedAt": "2026-05-01T00:00:00.000+00:00"
+  },
+  {
+    "id": 2,
+    "name": "Evening Yoga",
+    "description": "Wind down before bed",
+    "date": "2026-06-02T00:00:00.000+00:00",
+    "teacher_id": 2,
+    "users": [],
+    "createdAt": "2026-05-01T00:00:00.000+00:00",
+    "updatedAt": "2026-05-01T00:00:00.000+00:00"
+  }
+]
