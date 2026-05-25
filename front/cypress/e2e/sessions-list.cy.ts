@@ -1,6 +1,6 @@
 describe('Sessions list spec', () => {
 
-  // Plan de tests — Sessions : vérifie l'affichage et les boutons selon le rôle de l'utilisateur connecté.
+  // Plan de tests — Sessions : vérifie l'affichage des sessions et les boutons selon le rôle de l'utilisateur connecté.
   describe('As admin', () => {
 
     beforeEach(() => {

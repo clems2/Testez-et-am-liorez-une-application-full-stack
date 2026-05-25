@@ -1,3 +1,4 @@
+//tests  la réussite de la connexion, la gestion des erreurs de mauvaises entrées et l'affichage de celles-ci
 describe('Login spec', () => {
 
   beforeEach(() => {
@@ -66,7 +67,7 @@ describe('Login spec', () => {
       statusCode: 401,
       body: { message: 'Unauthorized' }
     }).as('login');
-    
+
     cy.get('input[formControlName=email]').type('wrong@test.com');
     cy.get('input[formControlName=password]').type('wrongpassword');
     cy.get('button[type=submit]').click();

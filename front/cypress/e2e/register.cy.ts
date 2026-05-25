@@ -1,3 +1,4 @@
+// Test la création de compte, l'affichae d'erreur en l'absence d'un champ obligatore
 describe('Register spec', () => {
 
   beforeEach(() => {

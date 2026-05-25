@@ -49,7 +49,6 @@
 Cypress.Commands.add('loginAs', (role: 'admin' | 'user') => {
   const fixtureName = role === 'admin' ? 'user-admin' : 'user-non-admin';
 
-  // Correction 2 : Utilisation correcte de "fixture:" au lieu de "body: { fixture }"
   cy.intercept('POST', '/api/auth/login', {
     statusCode: 200,
     fixture: fixtureName 
@@ -61,7 +60,6 @@ Cypress.Commands.add('loginAs', (role: 'admin' | 'user') => {
 
   cy.fixture(fixtureName).then((userFixture) => {
     cy.get('input[formControlName=email]').type(userFixture.username);
-    // Correction 1 : On enlève le {enter} et on clique explicitement sur le bouton
     cy.get('input[formControlName=password]').type('test!1234');
     cy.get('button[type=submit]').click();
   });
