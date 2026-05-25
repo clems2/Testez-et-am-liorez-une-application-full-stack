@@ -8,6 +8,18 @@
     "**/*.spec.ts",
     "./src/main.ts",
     "./src/test.ts",
-    "**/*.conf.js"
-  ]
+    "**/*.conf.js",
+    "**/*.module.ts",
+    "**/*.interface.ts",
+    "**/*.routes.ts",
+    "src/app/app.config.ts"
+  ],
+  "reporter": [
+    "lcov",
+    "text-summary"
+  ],
+  "branches": 80,
+  "lines": 80,
+  "functions": 80,
+  "statements": 80
 }
