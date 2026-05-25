@@ -47,22 +47,27 @@
 // Custom command : connexion en tant qu'admin ou user via les fixtures.
 // Ce raccourci évite de répéter le flow complet de login dans chaque test.
 Cypress.Commands.add('loginAs', (role: 'admin' | 'user') => {
-  const fixture = role === 'admin' ? 'user-admin' : 'user-non-admin';
+  const fixtureName = role === 'admin' ? 'user-admin' : 'user-non-admin';
 
-  cy.fixture(fixture).then((userFixture) => {
-    cy.intercept('POST', '/api/auth/login', {
-      statusCode: 200,
-      body: userFixture
-    }).as('login');
+  // Correction 2 : Utilisation correcte de "fixture:" au lieu de "body: { fixture }"
+  cy.intercept('POST', '/api/auth/login', {
+    statusCode: 200,
+    fixture: fixtureName 
+  }).as('login');
 
-    cy.intercept('GET', '/api/session', { fixture: 'sessions.json' }).as('sessions');
+  cy.intercept('GET', '/api/session', { fixture: 'sessions.json' }).as('sessions');
 
-    cy.visit('/login');
+  cy.visit('/login');
+
+  cy.fixture(fixtureName).then((userFixture) => {
     cy.get('input[formControlName=email]').type(userFixture.username);
-    cy.get('input[formControlName=password]').type('test!1234{enter}');
-    cy.wait('@login');
-    cy.url().should('include', '/sessions');
+    // Correction 1 : On enlève le {enter} et on clique explicitement sur le bouton
+    cy.get('input[formControlName=password]').type('test!1234');
+    cy.get('button[type=submit]').click();
   });
+
+  cy.wait('@login');
+  cy.url().should('include', '/sessions');
 });
 
 // Déclaration TypeScript pour que le custom command soit reconnu.
