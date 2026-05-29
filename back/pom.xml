@@ -172,8 +172,6 @@
                                 <exclude>**/payload/**</exclude>
                                 <exclude>**/models/**</exclude>
                                 <exclude>**/mapper/**</exclude>
-                                <exclude>**/configuration/**</exclude>
-                                <exclude>**/security/**</exclude>
                                 <exclude>**/exception/**</exclude>
                                 <exclude>**/SpringBootSecurityJwtApplication.class</exclude>
                             </excludes>
@@ -191,8 +189,6 @@
                                 <exclude>**/payload/**</exclude>
                                 <exclude>**/models/**</exclude>
                                 <exclude>**/mapper/**</exclude>
-                                <exclude>**/configuration/**</exclude>
-                                <exclude>**/security/**</exclude>
                                 <exclude>**/exception/**</exclude>
                                 <exclude>**/SpringBootSecurityJwtApplication.class</exclude>
                             </excludes>
