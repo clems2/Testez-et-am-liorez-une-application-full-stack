@@ -120,6 +120,31 @@ La capture d'écran ci-dessous résume les étapes précédentes :
 
 ![2-docker-desktop-bdd](pictures/2-docker-desktop-bdd.png)
 
+## Tests
+
+### Lancer les tests
+
+Les tests utilisent une base de données H2 en mémoire (aucune configuration ni Docker requis pour les tests).
+
+Pour lancer l'ensemble des tests unitaires et d'intégration :
+```
+mvn clean test
+```
+Cette commande exécute :
+- les **tests unitaires** sur les services (`*Test.java`, avec Mockito)
+- les **tests d'intégration** sur les controllers (`*IT.java`, avec Spring Boot Test + MockMvc + H2)
+
+### Rapport de couverture
+
+Le rapport de couverture JaCoCo est généré automatiquement après l'exécution des tests, dans :
+```
+back/target/site/jacoco/index.html
+```
+Ouvrez ce fichier dans un navigateur pour consulter la couverture détaillée.
+
+**Seuil minimum** : 80% sur tous les indicateurs (instructions, branches, lignes). Le build échoue si ce seuil n'est pas atteint.
+
+Les packages ne contenant pas de logique métier (dto, payload, models, mapper, configuration, security, exception) sont exclus du calcul de couverture.
 
 ## Ressources
 
