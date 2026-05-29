@@ -67,7 +67,6 @@ class TeacherServiceTest {
         verify(teacherRepository).findAll();
     }
 
-    // Plan de tests — Informations session : la page detail affiche le nom du professeur.
     // Vérifie que findById() retourne le bon teacher quand l'id existe.
     @Test
     void findById_shouldReturnTeacher_whenExists() {
