@@ -144,7 +144,7 @@ Ouvrez ce fichier dans un navigateur pour consulter la couverture détaillée.
 
 **Seuil minimum** : 80% sur tous les indicateurs (instructions, branches, lignes). Le build échoue si ce seuil n'est pas atteint.
 
-Les packages ne contenant pas de logique métier (dto, payload, models, mapper, configuration, security, exception) sont exclus du calcul de couverture.
+Les packages ne contenant pas de logique métier (dto, payload, models, mapper, exception) sont exclus du calcul de couverture.
 
 ## Ressources
 
