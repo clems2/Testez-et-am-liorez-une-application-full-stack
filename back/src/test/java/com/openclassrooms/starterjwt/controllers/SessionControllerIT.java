@@ -19,15 +19,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,8 +95,12 @@ class SessionControllerIT extends AbstractIntegrationTest {
     void findById_shouldReturnSession_whenExists() throws Exception {
         mockMvc.perform(get("/api/session/" + savedSession.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedSession.getId()))
                 .andExpect(jsonPath("$.name").value("Morning Yoga"))
-                .andExpect(jsonPath("$.description").value("A great session"));
+                .andExpect(jsonPath("$.description").value("A great session"))
+                .andExpect(jsonPath("$.teacher_id").value(savedTeacher.getId()))
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.users").isArray());
     }
 
     // Vérifie que findById retourne 404 quand la session n'existe pas.
@@ -117,7 +118,11 @@ class SessionControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/session"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].name").value("Morning Yoga"));
+                .andExpect(jsonPath("$[0].id").value(savedSession.getId()))
+                .andExpect(jsonPath("$[0].name").value("Morning Yoga"))
+                .andExpect(jsonPath("$[0].description").value("A great session"))
+                .andExpect(jsonPath("$[0].teacher_id").value(savedTeacher.getId()))
+                .andExpect(jsonPath("$[0].users").isArray());
     }
 
     // Vérifie que create persiste une nouvelle session et la retourne.
@@ -128,9 +133,13 @@ class SessionControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(post("/api/session")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andDo(print())  // ← ajoute cette ligne
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("New Session"));
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("New Session"))
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.description").value("A brand new session"))
+                .andExpect(jsonPath("$.teacher_id").value(secondTeacher.getId()))
+                .andExpect(jsonPath("$.users").isArray());
     }
 
     // Vérifie que create retourne 400 quand un champ obligatoire (name) est manquant.
@@ -155,7 +164,12 @@ class SessionControllerIT extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated Session"));
+                .andExpect(jsonPath("$.id").value(savedSession.getId()))
+                .andExpect(jsonPath("$.name").value("Updated Session"))
+                .andExpect(jsonPath("$.date").exists())
+                .andExpect(jsonPath("$.description").value("A brand new session"))
+                .andExpect(jsonPath("$.teacher_id").value(secondTeacher.getId()))
+                .andExpect(jsonPath("$.users").isArray());
     }
 
     // Vérifie que update retourne 400 quand un champ obligatoire est manquant.

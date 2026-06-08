@@ -46,7 +46,9 @@ class TeacherControllerIT extends AbstractIntegrationTest {
         mockMvc.perform(get("/api/teacher"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].firstName").value("Jane"));
+                .andExpect(jsonPath("$[0].id").value(savedTeacher.getId()))
+                .andExpect(jsonPath("$[0].firstName").value("Jane"))
+                .andExpect(jsonPath("$[0].lastName").value("Smith"));
     }
 
     // Vérifie que GET /api/teacher retourne 401 quand l'utilisateur n'est pas authentifié.
@@ -62,6 +64,7 @@ class TeacherControllerIT extends AbstractIntegrationTest {
     void findById_shouldReturnTeacher_whenExists() throws Exception {
         mockMvc.perform(get("/api/teacher/" + savedTeacher.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedTeacher.getId()))
                 .andExpect(jsonPath("$.firstName").value("Jane"))
                 .andExpect(jsonPath("$.lastName").value("Smith"));
     }

@@ -52,9 +52,11 @@ class UserControllerIT extends AbstractIntegrationTest {
     void findById_shouldReturnUser_whenExists() throws Exception {
         mockMvc.perform(get("/api/user/" + savedUser.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedUser.getId()))
                 .andExpect(jsonPath("$.email").value("test@test.com"))
                 .andExpect(jsonPath("$.firstName").value("John"))
-                .andExpect(jsonPath("$.lastName").value("Doe"));
+                .andExpect(jsonPath("$.lastName").value("Doe"))
+                .andExpect(jsonPath("$.admin").value(false));
     }
 
     // Vérifie que GET /api/user/{id} retourne 404 quand le user demandé n'existe pas.
